@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingeniería Electrónica – Universidad Antonio Nariño</title>
+  
+  <style>
+    /* --- Estilos Globales y Reseteo --- */
+    * { 
+      box-sizing: border-box; /* Asegura que padding y border no afecten el tamaño total */
+      margin: 0; 
+      padding: 0; 
+    }
+    body {
+      font-family: 'Poppins', sans-serif; /* Fuente principal */
+      background: #fff;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Centra todo el contenido */
+    }
+
+    /* --- 1. Encabezado (Header) --- */
+    header {
+      width: 100%;
+      background: #001f3f; /* Color azul institucional */
+      color: #fff;
+      position: relative; /* Necesario para posicionar el botón de contacto */
+    }
+    /* Contenedor del logo y título principal */
+    .header-box {
+      display: flex;
+      align-items: center;
+      padding: 1em 1em 0.25em; 
+      justify-content: center; 
+    }
+    /* Logo PNG realista (fimeb-icons.png) */
+    .logo-icons-img {
+      height: clamp(3.7em, 8.45vw, 5.07em); /* Tamaño aumentado y proporcional */
+      width: auto;
+      object-fit: contain; 
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5)); /* Sombra para realismo */
+    }
+    /* Título "FIMEB" */
+    .header-box .title {
+      font-size: clamp(3.0em, 7vw, 4.5em); /* Tamaño aumentado y proporcional */
+      font-weight: bold;
+      margin-left: 0.2em; /* Distancia reducida */
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3); 
+    }
+    /* Subtítulos del encabezado */
+    .header-subtext {
+      text-align: center;
+      padding: 0.25em 1em 0.5em; 
+    }
+    .header-subtext h1 {
+      margin: 0;
+      font-size: clamp(1.2em, 2.8vw, 1.6em); /* Proporcional */
+    }
+    .header-subtext p {
+      margin: 0;
+      font-size: clamp(1em, 2.4vw, 1.25em); /* Proporcional */
+      color: #DAA520; /* Color Dorado */
+      font-weight: bold; 
+    }
+    
+    /* --- 2. Botón de Contacto (Flotante) --- */
+    .contact-btn {
+      position: absolute;
+      top: 1em;
+      right: 1.5em;
+      width: 90px; 
+      height: 90px; 
+      background: transparent; 
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10; /* Se superpone a otros elementos */
+      box-shadow: 0 6px 12px rgba(0,0,0,0.4); 
+    }
+    .contact-btn img { 
+      width: 100%; 
+      height: 100%;
+      object-fit: contain; 
+      filter: brightness(1.1) drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
+    /* Efecto de realce al pasar el cursor */
+    .contact-btn:hover {
+      transform: scale(1.35); 
+      box-shadow: 0 12px 25px rgba(0,0,0,0.6); 
+    }
+
+    /* --- 3. Ventana Modal (Pop-up) de Contacto --- */
+    /* Fondo oscuro semitransparente */
+    .modal-overlay {
+      display: none; /* Oculto por defecto */
+      position: fixed; /* Ocupa toda la pantalla */
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1em;
+    }
+    /* Caja blanca del modal */
+    .modal-content {
+      background: #fff;
+      color: #333;
+      padding: 2em;
+      border-radius: 10px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 85vh; /* Altura máxima */
+      overflow-y: auto; /* Scroll si el contenido es muy largo */
+      position: relative;
+    }
+    .modal-content h2 { color: #001f3f; margin-top: 0; margin-bottom: 1em; }
+    .modal-content h3 { color: #003366; margin-top: 1.2em; margin-bottom: 0.5em; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+    .modal-content p { line-height: 1.6; margin: 0; }
+    .modal-content .close-btn { /* Botón de 'X' */
+      position: absolute;
+      top: 0.5em;
+      right: 0.75em;
+      font-size: 2.5rem;
+      color: #aaa;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-content .close-btn:hover { color: #000; }
+    
+    /* Resaltado de ubicaciones en el modal */
+    .contact-location {
+      padding: 0.75em;
+      margin-bottom: 0.5em;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+    }
+    .contact-location:hover {
+      background-color: #f0f8ff; 
+    }
+    .contact-location h3 { margin-top: 0; }
+    
+    /* Enlace de Google Maps en el modal */
+    .modal-content a {
+      color: #004080;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+    .modal-content a:hover {
+      color: #001f3f;
+    }
+
+    /* --- 4. Sección Principal (Cuerpo) --- */
+    section {
+      width: 100%;
+      max-width: 900px;
+      padding: 1em;
+      display: flex;
+      flex-direction: column;
+      gap: 2em; /* Espacio entre los bloques de contenido */
+    }
+    
+    /* Fila de botones de inscripción */
+    .button-row {
+      display: flex;
+      flex-wrap: wrap; /* Para que se apilen en móvil */
+      gap: 1em;
+      background-image: url('https://cdn.pixabay.com/photo/2016/11/29/09/32/circuit-board-1864667_1280.jpg');
+      background-size: cover;
+      background-position: center;
+      padding: 2em 1em;
+      border-radius: 16px;
+    }
+    .button-row a {
+      flex: 1 1 calc(33% - 1em); /* Flexible, base de 3 columnas */
+      text-decoration: none;
+      color: #fff;
+      background: #001f3f; 
+      padding: 0.9em;
+      border-radius: 10px;
+      font-weight: 600;
+      text-align: center;
+      transition: transform 0.2s, background 0.3s;
+      font-size: clamp(0.9em, 2.2vw, 1.2em);
+    }
+    .button-row a:hover {
+      transform: scale(1.05);
+      background: #00365a;
+    }
+    
+    /* Cuadro de texto azul (Directiva + Tabla) */
+    .info-box {
+      background: #f0f8ff; 
+      color: #001f3f; 
+      border: 1px solid #003366; 
+      border-radius: 10px;
+      padding: 1.2em;
+      margin-top: -1em; /* Distancia reducida con botones */
+    }
+    .info-box h3 {
+      margin-top: 0;
+      margin-bottom: 0.75em;
+      text-align: center;
+      font-weight: bold;
+      font-size: clamp(1.0em, 2.2vw, 1.25em); /* Título reducido */
+    }
+    .info-box p {
+      text-align: justify;
+      font-size: clamp(0.9em, 2.2vw, 1.1em); /* Fuente unificada */
+      line-height: 1.6;
+      margin: 0;
+    }
+    
+    /* Tabla de descuentos Saber 11 */
+    .discount-table {
+      width: 100%;
+      overflow-x: auto; /* Scroll horizontal en móvil */
+      margin-top: 1.5em; 
+    }
+    .discount-table table {
+      width: 100%;
+      border-collapse: collapse;
+      color: #000;
+    }
+    .discount-table th, .discount-table td {
+      padding: 0.6em 0.8em;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    .discount-table th {
+      background: #003366;
+      color: #fff;
+    }
+    
+    /* Texto resaltado de SENA y FFMM */
+    .extra-discounts {
+      margin-top: 1em;
+      font-size: clamp(0.9em, 2.2vw, 1.1em); /* Fuente unificada */
+      color: #001f3f; 
+      text-align: justify; 
+      line-height: 1.6; 
+      background-color: #ffffff; 
+      padding: 0.75em;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+    }
+    
+    /* Estilos para los botones Desplegables */
+    .dropdown {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .dropdown button {
+      width: 100%;
+      background: #001f3f; 
+      color: #fff;
+      padding: 1em;
+      border: none;
+      border-radius: 10px;
+      font-size: clamp(1em, 2.5vw, 1.3em);
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .dropdown-content {
+      display: none; /* JS controla esto (excepto el primero) */
+      background: #f9f9f9;
+      border-radius: 10px;
+      margin-top: 0.5em;
+      overflow: hidden;
+    }
+    .dropdown-content .item {
+      padding: 0.9em 1em;
+      border-bottom: 1px solid #ddd;
+    }
+    .dropdown-content .item:last-child {
+      border-bottom: none;
+    }
+    .dropdown-content .item a {
+      color: #001f3f;
+      text-decoration: none;
+      font-size: clamp(0.9em, 2.3vw, 1.1em);
+    }
+    
+    /* Texto de ICETEX y FES Meta */
+    .fixed-note {
+      text-align: justify;
+      margin: 0.5em 0 0 0; /* Posicionado sobre el dropdown */
+      font-size: clamp(0.9em, 2.2vw, 1.1em); /* Fuente unificada */
+      color: #001f3f; 
+      padding: 0 1em;
+      line-height: 1.6; 
+    }
+    .fixed-note a {
+      color: #004080;
+      text-decoration: underline;
+      font-weight: bold;
+    }
+    
+    /* Clase para reducir espacio del dropdown de financiación */
+    .financing-dropdown {
+      margin-top: -1em; 
+    }
+
+    /* --- 5. Pie de Página (Footer) --- */
+    /* Barra de información SNIES */
+    .info-section {
+      width: 100vw;
+      display: flex;
+      justify-content: space-evenly;
+      flex-wrap: wrap;
+      gap: 1em;
+      background: #f9f9f9;
+      padding: 1em 0.5em;
+      margin: 2em 0;
+    }
+    .info-section .info-item {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: clamp(0.9em, 2.0vw, 1em);
+      color: #003366;
+      min-width: 120px;
+    }
+    /* Barra final de copyright */
+    footer {
+      width: 100%;
+      text-align: center;
+      font-size: clamp(0.75em, 2vw, 0.9em);
+      padding: 1.5em 1em 2em;
+      background: #001f3f;
+      color: #fff;
+    }
+    
+    /* --- 6. Media Queries (Diseño Responsivo) --- */
+    @media (max-width: 600px) {
+      /* Botones de inscripción en una sola columna */
+      .button-row a {
+        flex: 1 1 100%;
+      }
+      /* Icono de contacto más pequeño y reubicado */
+      .contact-btn {
+        width: 50px; 
+        height: 50px; 
+        top: 0.5em;
+        right: 0.5em;
+      }
+      /* Espacio para que el título no choque con el botón de contacto */
+      .header-box {
+        padding-top: 3.5em; 
+      }
+      /* Barra SNIES en una sola columna */
+      .info-section {
+        flex-direction: column;
+      }
+      .info-section .info-item {
+        text-align: left;
+      }
+    }
+  </style>
+  </head>
+<body>
+
+  <header>
+    <button class="contact-btn" id="openModalBtn">
+      <img src="phone-icon-transparent.png" alt="Icono de teléfono"> 
+    </button>
+    
+    <div class="header-box">
+      <img src="fimeb-icons.png" alt="Iconos FIMEB" class="logo-icons-img">
+      <div class="title">FIMEB</div>
+    </div>
+    
+    <div class="header-subtext">
+      <h1>Facultad de Ingeniería Mecánica, Electrónica y Biomédica</h1>
+      <p>Ingeniería Electrónica – Universidad Antonio Nariño</p>
+    </div>
+  </header>
+  <section>
+    
+    <div class="button-row">
+      <a href="https://www.uan.edu.co/images/Institucion/Oficinas/OficinaAdmisiones/documentos/ListaDocumentosInscripcion.pdf" target="_blank">📋 Lista de Documentos</a>
+      <a href="https://service.uan.edu.co/common/inscriptions/university_inscription/inscription_formHome.jsp" target="_blank">🖋️ Iniciar Inscripción</a>
+      <a href="https://service.uan.edu.co/common/inscriptions/university_inscription/incription_validate.jsp?type=1&alea=97150.23039735571" target="_blank">✅ Validar Inscripción</a>
+    </div>
+
+    <div class="info-box">
+      <h3>Beneficio Matrícula Estudiantes Nuevos</h3>
+      <p>La Directiva Rectoral 003/2012 ofrece un beneficio para estudiantes nuevos que ingresen a primer semestre desde 2018-01 y hayan presentado las pruebas Saber desde 2012. Para mantenerlo, se exige un promedio general mínimo de 4.0. No aplica para ingresos por transferencia interna o externa, ni para programas del área de Ciencias de la Salud. Esta normativa promueve el rendimiento académico y la permanencia con excelencia.</p>
+
+      <div class="discount-table">
+        <table>
+          <thead>
+            <tr><th>Puntaje Saber 11</th><th>Estrato 1-2</th><th>Estrato 3</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>320-339</td><td>30 %</td><td>20 %</td></tr>
+            <tr><td>340-359</td><td>40 %</td><td>30 %</td></tr>
+            <tr><td>360-379</td><td>50 %</td><td>40 %</td></tr> <tr><td>380 o más</td><td>60 %</td><td>50 %</td></tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <p class="extra-discounts">
+        • Convenio SENA: <strong>20 %</strong> de descuento.<br>
+        • Fuerzas Militares y Policía: <strong>15 %</strong> de descuento.
+      </p>
+    </div>
+
+    <div class="dropdown">
+      <button onclick="toggleDropdown1()">🎓 Becas & Auxilios</button>
+      <div id="ddContent1" class="dropdown-content" style="display: block;">
+        <div class="item">
+          <a href="https://www.uan.edu.co/becas-y-auxilios" target="_blank">➤ Auxilios propios UAN</a>
+        </div>
+        <div class="item">
+          <a href="https://www.uan.edu.co/ingenieria-electronica-valor-matricula" target="_blank">➤ Valor Matrícula</a>
+        </div>
+      </div>
+    </div>
+
+    <p class="fixed-note">
+      Explora hoy estas oportunidades de financiación – a través de <strong>ICETEX</strong> (<a href="https://web.icetex.gov.co/creditos/planes-de-financiacion" target="_blank">Planes de financiación ICETEX</a>) o del <strong>FES Meta</strong> – y asegura tu camino hacia la universidad sin depender únicamente de tus recursos económicos: 
+      <a href="https://sites.google.com/meta.gov.co/fses/inicio" target="_blank">Conoce el sitio oficial del FES Meta</a>.
+    </p>
+
+    <div class="dropdown financing-dropdown">
+      <button onclick="toggleDropdown2()">💡 Fuentes de Financiación</button>
+      <div id="ddContent2" class="dropdown-content">
+        <div class="item">
+          <a href="https://fincoeducar.fincomercio.com/Fincoeducar/Home/IndexApp.jsp?ID=BF6776FC-24A5-ACB9-A1E17E521FAD" target="_blank">🏦 UAN – Fincoeducar</a>
+        </div>
+        <div class="item">
+          <a href="https://www.financieracomultrasan.com.co/es/personas/necesidades/mi-proyecto-de-estudio/financiar-mi-estudio" target="_blank">💳 Comultrasan</a>
+        </div>
+        <div class="item">
+          <a href="https://coopfuturo.com.co/" target="_blank">🤝 Coopfuturo</a>
+        </div>
+        <div class="item">
+          <a href="https://www.fincomercio.com/credito-educativo" target="_blank">🏛️ Fincomercio</a> </div>
+        <div class="item">
+          <a href="https://sufi.grupobancolombia.com/sufi/creditos/campus-sufi/credito-educativo" target="_blank">💚 SUFI Bancolombia</a> </div>
+      </div>
+    </div>
+
+  </section>
+  <div class="info-section">
+    <div class="info-item"><strong>SNIES:</strong> 6082</div>
+    <div class="info-item"><strong>Fecha de inicio:</strong> 01/12/2023</div>
+    <div class="info-item"><strong>Vigencia:</strong> 7 años</div>
+    <div class="info-item"><strong>Plan de estudios:</strong> 2652</div>
+    <div class="info-item"><strong>Resolución:</strong> 14/11/2023</div>
+    <div class="info-item"><strong>Total de Créditos:</strong> 138</div>
+    <div class="info-item"><strong>Tipo de Programa:</strong> Pregrado</div>
+  </div>
+
+  <footer>
+    © Universidad Antonio Nariño<br>
+    “Construye el futuro con tecnología y pasión”
+  </footer>
+  <div id="contactModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <span class="close-btn" id="closeModalBtn">×</span>
+      <h2>Información de Contacto</h2>
+      
+      <div class="contact-location">
+        <h3>Villavicencio</h3>
+        <p>
+          Dirección: <a href="https://maps.google.com/?cid=7082559127638036681&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ" target="_blank">Km. 1 Vía Puerto López - Vereda La Cecilia</a><br>
+          coordinador.villavicencio.fimeb@uan.edu.co<br>
+          director.villavicencio@uan.edu.co<br>
+          Teléfono: 3102613139
+        </p>
+      </div>
+
+      <div class="contact-location">
+        <h3>Cartagena</h3>
+        <p>
+          Dirección: Av. Crisanto Luque. Diagonal 22 # 48 A - 64<br>
+          Teléfonos: (+57 605) 669 0958 - 662 9426
+        </p>
+      </div>
+
+      <div class="contact-location">
+        <h3>Ibagué</h3>
+        <p>
+          Dirección: Carrera 10 # 17 - 35 Barrio Ancón<br>
+          Teléfonos: (+57 608) 276 0728 - 261 8564
+        </p>
+      </div>
+
+      <div class="contact-location">
+        <h3>Neiva</h3>
+        <p>
+          <strong>Buganviles:</strong> Calle 19 # 42 -98.<br>
+          <strong>Áltico:</strong> Calle 7 # 13 - 27<br>
+          Teléfonos: (+57 608) 877 5968 - 877 0853 - 871 6028 - 871 9541
+        </p>
+      </div>
+
+      <div class="contact-location">
+        <h3>Bogotá</h3>
+        <p>
+          Dirección: Sede Sur, Calle 22 Sur # 12 D - 81<br>
+          Teléfono: (+57 601) 315 2980 Ext. 1505
+        </p>
+      </div>
+
+</div>
+  </div>
+  <script>
+    // --- Lógica para los Botones Desplegables ---
+    
+    /* Función para el botón "Becas & Auxilios" */
+    function toggleDropdown1(){
+      const dd1 = document.getElementById('ddContent1');
+      dd1.style.display = dd1.style.display === 'block' ? 'none' : 'block';
+    }
+
+    /* Función para el botón "Fuentes de Financiación" */
+    function toggleDropdown2(){
+      const dd2 = document.getElementById('ddContent2');
+      dd2.style.display = dd2.style.display === 'block' ? 'none' : 'block';
+    }
+
+    /* --- Lógica para el Modal (Pop-up) de Contacto --- */
+    
+    // Obtener los elementos del DOM
+    const modal = document.getElementById('contactModal');
+    const openBtn = document.getElementById('openModalBtn');
+    const closeBtn = document.getElementById('closeModalBtn');
+
+    // Función para abrir el modal
+    function openModal() {
+      modal.style.display = 'flex';
+    }
+
+    // Función para cerrar el modal
+    function closeModal() {
+      modal.style.display = 'none';
+    }
+
+    // Asignar las funciones a los clics de los botones
+    openBtn.onclick = openModal;
+    closeBtn.onclick = closeModal;
+
+    // Cierra el modal si se hace clic fuera de la caja de contenido
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        closeModal();
+      }
+    }
+  </script>
+  </body>
+</html>
